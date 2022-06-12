@@ -63,21 +63,40 @@ const Proyectos = (props: ProyectosProps) => {
     };
 
     //nos va a servir para traenos los proyectos
-    const gatherProjects = () => {
-        setLoading(true)
+    /*const gatherProjects = () => {
+        //setLoading(true)
         fetch('http://localhost:2000/projects')
             .then(res => res.json())
             .then(res => {
                 setLoadedProjects(res.Projects)
+                console.log(res.Projects)
 
             })
             .catch(err => console.log(err))
         sleep(3000).then(res => setLoading(false));
-    }
+    }*/
+const gatherProjects = () => {
+        //setLoading(true)
+        fetch('http://localhost:2000/projects',{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response) => {
+                return response.json()})
+            .then((myJson) => {
+                console.log(myJson)
+                setLoadedProjects(myJson.Projects)
+
+            })
+            .catch(err => console.log(err))
+        sleep(3000).then(res => setLoading(false));
+}
 
     useEffect(() => {
         gatherProjects()
-    }, []);
+    }, []);ProjectTableRow
 
     return (
         <>
@@ -112,6 +131,7 @@ const Proyectos = (props: ProyectosProps) => {
                                     <TableCell align="left">Riesgo</TableCell>
                                 </TableRow>
                             </TableHead>
+                            <Button onClick={gatherProjects}>get</Button>
                             <TableBody>
                                 {loadedProjects && loadedProjects.map(row => <ProjectTableRow refresh={gatherProjects} row={row} key={row.id} />)}
                             </TableBody>
