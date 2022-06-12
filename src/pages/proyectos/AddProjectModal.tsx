@@ -13,7 +13,7 @@ const AddProjectModal = (props: AddProjectModalProps) => {
     const [state, setState] = useState('');
     const { onSubmit, onClose, show } = props
     const [newProject, setNewProject] = useState({
-        title: "",
+        name: "",
         description: "",
         id: 0, //realizar un generador de id
         creationDate: new Date().toLocaleDateString('es-AR'),
@@ -37,7 +37,8 @@ const AddProjectModal = (props: AddProjectModalProps) => {
         const response = await fetch('http://localhost:2000/projects', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+
             },
             body: JSON.stringify(newProject)
         })
@@ -47,10 +48,11 @@ const AddProjectModal = (props: AddProjectModalProps) => {
     const handleSubmit = async () => {
         //va esta funcion porque asi mandamos el proyecto nuevo a la api
         //y si esta ok ahi recien se submitea
-        /*const response = await generateProjectUsingAPI()
+        console.log("hola")
+        const response = await generateProjectUsingAPI()
         if (response.status === 200) {
             onSubmit()
-        }*/
+        }
         onSubmit();
     };
 
@@ -71,7 +73,7 @@ const AddProjectModal = (props: AddProjectModalProps) => {
                 <Typography variant='h5' className={'m-10'}>Ingrese los datos para el nuevo proyecto</Typography>
                 <div className='ml-10 flex flex-col items-center'>
                     <div className='flex mb-6 flex-row'>
-                        <TextField required id="outlined-basic" name="title" className='mr-8 w-80' label="Nombre del Proyecto" InputLabelProps={{ shrink: true}} variant="outlined" onChange={handleChangeText} />
+                        <TextField required id="outlined-basic" name="name" className='mr-8 w-80' label="Nombre del Proyecto" InputLabelProps={{ shrink: true}} variant="outlined" onChange={handleChangeText} />
                         <div className='mr-8 w-80'></div>
                     </div>
                     <div className='flex mb-6 flex-row'>
@@ -119,3 +121,4 @@ const AddProjectModal = (props: AddProjectModalProps) => {
 }
 
 export default AddProjectModal
+
