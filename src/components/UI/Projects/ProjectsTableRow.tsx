@@ -12,7 +12,7 @@ const  ProjectTableRow = (props:  ProjectTableRowProps) => {
     const { row, refresh } = props
 
     const deleteItems = () => {
-        fetch(`http://localhost:2000/projects/${row.id}`, {
+        fetch(`http://localhost:2000/projects/${row._id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -39,9 +39,9 @@ const  ProjectTableRow = (props:  ProjectTableRowProps) => {
     }, []);
 
     return (
-        <TableRow hover key={row.id}>
-            <TableCell align="left">{row.id}</TableCell>
-            <TableCell align="left">{row.title}</TableCell>
+        <TableRow hover key={row._id}>
+            <TableCell align="left">{row._id}</TableCell>
+            <TableCell align="left">{row.name}</TableCell>
             <TableCell align="left">{row.type}</TableCell>
             <TableCell align="left">{row.state}</TableCell>           
             <TableCell align="left">{new Date(row.creationDate).toLocaleDateString('es-AR')}</TableCell>

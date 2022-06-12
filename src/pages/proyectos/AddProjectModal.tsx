@@ -48,7 +48,6 @@ const AddProjectModal = (props: AddProjectModalProps) => {
     const handleSubmit = async () => {
         //va esta funcion porque asi mandamos el proyecto nuevo a la api
         //y si esta ok ahi recien se submitea
-        console.log("hola")
         const response = await generateProjectUsingAPI()
         if (response.status === 200) {
             onSubmit()
@@ -84,13 +83,7 @@ const AddProjectModal = (props: AddProjectModalProps) => {
                                 </MenuItem>
                             ))}
                         </TextField>
-                        <TextField required id="outlined-basic" name="client" className='mr-8 w-80' label="Identifique el cliente por nombre o por CUIT" InputLabelProps={{ shrink: true}} variant="outlined" onChange={handleChangeText} 
-                            InputProps={{
-                                startAdornment: (
-                                <InputAdornment position="start">
-                                    <AccountCircle/>
-                                </InputAdornment>),}}
-                        />
+                        <div className='mr-8 w-80'/>
                     </div>
                     <div className='flex mb-6 flex-row'>
                         <TextField required select value={state} id="outlined-basic" name="state" className='mr-8 w-80' label="Seleccione un estado inicial" variant="outlined" onChange={handleStateSelection}>

@@ -62,19 +62,6 @@ const Proyectos = (props: ProyectosProps) => {
         gatherProjects();
     };
 
-    //nos va a servir para traenos los proyectos
-    /*const gatherProjects = () => {
-        //setLoading(true)
-        fetch('http://localhost:2000/projects')
-            .then(res => res.json())
-            .then(res => {
-                setLoadedProjects(res.Projects)
-                console.log(res.Projects)
-
-            })
-            .catch(err => console.log(err))
-        sleep(3000).then(res => setLoading(false));
-    }*/
 const gatherProjects = () => {
         //setLoading(true)
         fetch('http://localhost:2000/projects',{
@@ -86,17 +73,17 @@ const gatherProjects = () => {
             .then((response) => {
                 return response.json()})
             .then((myJson) => {
-                console.log(myJson)
-                setLoadedProjects(myJson.Projects)
+                console.log(myJson);
+                setLoadedProjects(JSON.parse(JSON.stringify(myJson)));
 
             })
             .catch(err => console.log(err))
-        sleep(3000).then(res => setLoading(false));
+            sleep(3000).then(res => setLoading(false));
 }
 
     useEffect(() => {
-        gatherProjects()
-    }, []);ProjectTableRow
+        gatherProjects();
+    }, []);
 
     return (
         <>
@@ -131,9 +118,8 @@ const gatherProjects = () => {
                                     <TableCell align="left">Riesgo</TableCell>
                                 </TableRow>
                             </TableHead>
-                            <Button onClick={gatherProjects}>get</Button>
                             <TableBody>
-                                {loadedProjects && loadedProjects.map(row => <ProjectTableRow refresh={gatherProjects} row={row} key={row.id} />)}
+                                {loadedProjects && loadedProjects.map(row => <ProjectTableRow refresh={gatherProjects} row={row} key={row._id} />)}
                             </TableBody>
                         </Table>
                     </TableContainer>
