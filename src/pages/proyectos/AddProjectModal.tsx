@@ -1,5 +1,6 @@
 import { Modal, TextField, Typography, MenuItem, InputAdornment } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react'
+import{Client} from '../../components/types/clientTypes'
 import AccountCircle from '@mui/icons-material/AccountCircle';
 
 interface AddProjectModalProps {
@@ -8,7 +9,10 @@ interface AddProjectModalProps {
     show: boolean
 }
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 const AddProjectModal = (props: AddProjectModalProps) => {
+    
     const [type, setType] = useState('');
     const [showProductModal, setProductModal] = useState(false);
     const { onSubmit, onClose, show } = props;
@@ -16,6 +20,8 @@ const AddProjectModal = (props: AddProjectModalProps) => {
     const [isNameValid, setNameValidation] = useState(true);
     const [isClientValid, setClientValidation] = useState(true);
     const [isTypeValid, setTypeValidation] = useState(true);
+    const [isLoading, setLoading] = useState<boolean>(false)
+    const [loadedClients, setLoadedClients] = useState<Client[]>([])
     const [newProject, setNewProject] = useState({
         name: "",
         id: 0, //realizar un generador de id
@@ -33,6 +39,29 @@ const AddProjectModal = (props: AddProjectModalProps) => {
     const handleChangeText = (e: any) => {
         setNewProject(({ ...newProject, [e.target.name]: e.target.value }))
     };
+
+    const getClientsFromExternalAPI = () => {
+        //setLoading(true)
+        fetch('https://anypoint.mulesoft.com/mocking/api/v1/sources/exchange/assets/754f50e8-20d8-4223-bbdc-56d50131d0ae/clientes-psa/1.0.0/m/api/clientes',{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response) => {
+                return response.json()})
+            .then((myJson) => {
+                console.log(myJson);
+                setLoadedClients(JSON.parse(JSON.stringify(myJson)));
+
+            })
+            .catch(err => console.log(err))
+            sleep(3000).then(res => setLoading(false));
+    }
+
+    useEffect(() => {
+        getClientsFromExternalAPI();
+    }, []);
 
     const generateProjectUsingAPI = async () => {
         const response = await fetch('http://localhost:2000/projects', {

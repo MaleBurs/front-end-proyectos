@@ -9,8 +9,11 @@ interface AddProjectModalProps {
     show: boolean
 }
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 const AddProjectModal = (props: AddProjectModalProps) => {
     const { onSubmit, onClose, show } = props;
+    const [isLoading, setLoading] = useState<boolean>(false)
     const [resources, setResources] = useState(new Set()); //uso sets para no tener repetidos
 
     const handleChangeText = (e: any) => {
@@ -22,8 +25,24 @@ const AddProjectModal = (props: AddProjectModalProps) => {
         setResources(new Set([...currentResources, [newValue]]));
     };
 
-    const addResourcesToProjectUsingAPI = async () => {
+    const addResourcesToProjectUsingAPI = async () =>  {
         //deberiamos elegir el proyecto recien creado y agregarle estos recursos
+        //setLoading(true)
+        fetch('https://anypoint.mulesoft.com/mocking/api/v1/sources/exchange/assets/754f50e8-20d8-4223-bbdc-56d50131d0ae/recursos-psa/1.0.0/m/api/recursos',{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response) => {
+                return response.json()})
+            .then((myJson) => {
+                console.log(myJson);
+                setResources(JSON.parse(JSON.stringify(myJson)));
+
+            })
+            .catch(err => console.log(err))
+            sleep(3000).then(res => setLoading(false));
     }
 
     const handleSubmit = async () => {
