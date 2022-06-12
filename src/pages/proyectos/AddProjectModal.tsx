@@ -10,11 +10,14 @@ interface AddProjectModalProps {
 
 const AddProjectModal = (props: AddProjectModalProps) => {
     const [type, setType] = useState('');
-    const [showProductModal, setProductModal] = useState(false)
-    const { onSubmit, onClose, show } = props
+    const [showProductModal, setProductModal] = useState(false);
+    const { onSubmit, onClose, show } = props;
+    const [isFormValid, setFormValidation] = useState(false);
+    const [isNameValid, setNameValidation] = useState(true);
+    const [isClientValid, setClientValidation] = useState(true);
+    const [isTypeValid, setTypeValidation] = useState(true);
     const [newProject, setNewProject] = useState({
         name: "",
-        description: "",
         id: 0, //realizar un generador de id
         creationDate: new Date().toLocaleDateString('es-AR'),
         updatedDate: new Date().toLocaleDateString('es-AR'),
@@ -22,8 +25,7 @@ const AddProjectModal = (props: AddProjectModalProps) => {
         state: "No Iniciado",
         client: 0,
         productId: 0,
-        iteration: 1,
-        phase: 1,
+        description: " ",
     })
 
     const types = [{ value: 'desarrollo', label: 'Desarrollo', }, {value: 'soporte', label: 'Soporte'} ];
@@ -45,10 +47,6 @@ const AddProjectModal = (props: AddProjectModalProps) => {
     }
 
     const handleSubmitProductModal = async () =>{
-        const response = await generateProjectUsingAPI()
-        if (response.status === 200) {
-            onSubmit();
-        }
         setProductModal(false);
     }
 
@@ -56,22 +54,66 @@ const AddProjectModal = (props: AddProjectModalProps) => {
         setProductModal(false);
     }
 
+    const validateProjectName = () =>{
+        if (newProject.name != "" && newProject.name.length<=20)
+            setNameValidation(true);
+        else
+            setNameValidation(false);
+    }
+
+    const validateProjectType = () =>{
+        if (newProject.type != "")
+            setTypeValidation(true);
+        else 
+            setTypeValidation(false);
+    }
+
+    const validateProjectClient = () =>{
+        if (newProject.client != 0)
+            setClientValidation(true);
+        else
+            setClientValidation(false);
+    }
+  
+    const isADevelopProjectAndHasNOTAProductAssign = newProject.type == "desarrollo" && newProject.productId == 0;
+    
+    const validateProjectValues = () =>{
+        validateProjectClient();
+        validateProjectName();
+        validateProjectType();
+
+        if (isNameValid && isTypeValid && isClientValid){
+            setFormValidation(true);
+            console.log("entro");
+        }
+        /*if (isADevelopProjectAndHasNOTAProductAssign)
+            setFormValidation(false);*/
+    }
+
     const handleSubmit = async () => {
-        if(newProject.type == "desarrollo"){
-            console.log('si es de desarrollo');
+        validateProjectValues();
+        if(isADevelopProjectAndHasNOTAProductAssign){
             setProductModal(true);
-        }else{
-            console.log("no es de desarrollo");
+        }else if(isFormValid){
             const response = await generateProjectUsingAPI()
-            if (response.status === 200) {
+            /*if (response.status === 200) {
                 onSubmit();
-            }
+            }*/
+            onSubmit();
         }
     };
 
     const handleTypeSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
         setType(event.target.value);
         setNewProject(({ ...newProject, [event.target.name]: event.target.value }))
+    };
+
+    const onCloseCreateProjectModal = () =>{
+        setClientValidation(true);
+        setFormValidation(false);
+        setNameValidation(true);
+        setTypeValidation(true);
+        onClose();
     };
 
     return (
@@ -91,7 +133,7 @@ const AddProjectModal = (props: AddProjectModalProps) => {
                             </div>
                             <div className="w-10" ></div>
                             <div className="text-center mr-8 mb-6 w-52  border-2 border-slate-400  rounded-xl shadow-lg font-bold text-slate-800 hover:border-teal-600 hover:border-1 hover:bg-gray-200 hover:text-teal-600 transition-all duration-300 cursor-pointer" onClick={handleSubmitProductModal}>
-                                <div className="m-4" > Crear Proyecto</div>
+                                <div className="m-4" > Siguiente</div>
                         </div>
                     </div>
 
@@ -101,18 +143,18 @@ const AddProjectModal = (props: AddProjectModalProps) => {
                 <Typography variant='h5' className={'m-10'}>Ingrese los datos para el nuevo proyecto</Typography>
                 <div className='ml-10 flex flex-col items-center'>
                     <div className='flex mb-6 flex-row'>
-                        <TextField required id="outlined-basic" name="name" className='mr-8 w-80' label="Nombre del Proyecto" InputLabelProps={{ shrink: true}} variant="outlined" onChange={handleChangeText} />
+                        <TextField required id="outlined-basic" name="name" className='mr-8 w-80' style={{backgroundColor: isNameValid ? 'transparent' : '#F3909C'}} label="Nombre del Proyecto" InputLabelProps={{ shrink: true}} variant="outlined" onChange={handleChangeText} />
                         <div className='mr-8 w-80'></div>
                     </div>
                     <div className='flex mb-6 flex-row'>
-                        <TextField required select value={type} id="outlined-basic" name="type" className='mr-8 w-80' label="Seleccione el tipo de proyecto" variant="outlined" onChange={handleTypeSelection}>
+                        <TextField required select value={type} id="outlined-basic" name="type" className='mr-8 w-80' style={{backgroundColor: isTypeValid ? 'transparent' : '#F3909C'}} label="Seleccione el tipo de proyecto" variant="outlined" onChange={handleTypeSelection}>
                             {types.map((option) => (
                                 <MenuItem key={option.value} value={option.value}>
                                 {option.label}
                                 </MenuItem>
                             ))}
                         </TextField>
-                        <TextField required name="client" className='mr-8 w-80' label="Identifique el cliente por nombre o por CUIT" InputLabelProps={{ shrink: true}} variant="outlined" onChange={handleChangeText} 
+                        <TextField required name="client" className='mr-8 w-80' style={{backgroundColor: isClientValid ? 'transparent' : '#F3909C'}}  label="Identifique el cliente por nombre o por CUIT" InputLabelProps={{ shrink: true}} variant="outlined" onChange={handleChangeText} 
                             InputProps={{
                                 startAdornment: (
                                 <InputAdornment position="start">
@@ -120,16 +162,16 @@ const AddProjectModal = (props: AddProjectModalProps) => {
                                 </InputAdornment>),}}
                         />
                     </div>
-                    <TextField id="outlined-basic" className='mb-6 w-[42rem] mr-8' name='description' label="Descripcion" multiline rows={2} InputLabelProps={{ shrink: true }} variant="outlined" onChange={handleChangeText} />
+                    <TextField id="outlined-basic" className='mb-6 w-[42rem] mr-8' name='description' label="Descripcion" multiline rows={3} InputLabelProps={{ shrink: true }} variant="outlined" onChange={handleChangeText} />
                     <div className='flex mb-6 flex-row'></div>
                     <div className='flex mb-6 flex-row'>  </div>
                     <div className="flex flex-row" >
-                        <div className="text-center mr-8 mb-6 w-52 border-2 border-slate-400  rounded-xl shadow-lg font-bold text-slate-800 hover:border-teal-600 hover:border-1 hover:bg-gray-200 hover:text-teal-600 transition-all duration-300 cursor-pointer" onClick={onClose} >
+                        <div className="text-center mr-8 mb-6 w-52 border-2 border-slate-400  rounded-xl shadow-lg font-bold text-slate-800 hover:border-teal-600 hover:border-1 hover:bg-gray-200 hover:text-teal-600 transition-all duration-300 cursor-pointer" onClick={onCloseCreateProjectModal} >
                             <div className="m-4" > Cancelar</div>
                         </div>
                         <div className="w-56" ></div>
                         <div className="text-center mr-8 mb-6 w-52  border-2 border-slate-400  rounded-xl shadow-lg font-bold text-slate-800 hover:border-teal-600 hover:border-1 hover:bg-gray-200 hover:text-teal-600 transition-all duration-300 cursor-pointer" onClick={handleSubmit}>
-                            <div className="m-4" > Siguiente </div>
+                            <div className="m-4" > Crear Proyecto </div>
                         </div>
                     </div>
 
